@@ -1,0 +1,5 @@
+<ul>
+    #foreach($item in $conversation.getConversationList())
+        <li>$item</li>
+    #end
+</ul>

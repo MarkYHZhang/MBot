@@ -1,0 +1,118 @@
+<html>
+
+<style>
+    input[type=text]{
+        position:absolute;
+        width:80%;
+        height:40px;
+        margin-left:-40%;
+        bottom:7px;
+        left:50%;
+        display: inline-block;
+        border: none;
+        border-bottom: 1px solid grey;
+        outline-width: 0;
+        font-size: 130%;
+    }
+    label{
+        position:absolute;
+        width:80%;
+        height:30px;
+        margin-left:-40%;
+        bottom:35px;
+        left:50%;
+        display: inline-block;
+        outline-width: 0;
+        font-size: 65%;
+    }
+
+    div{
+        margin: auto;
+        width: 50%;
+        padding: 10px;
+    }
+    ul, li {
+        list-style:none;
+        padding:7;
+        margin:0;
+        font-size: 115%;
+        font-family: Sans-Serif;
+    }
+    #listWrapper {
+        max-height:90%;
+        width: 80%;
+        overflow-y:auto;
+    }
+    #listWrapper::-webkit-scrollbar {
+        /*remove scrollbar*/
+        display: none;
+    }
+
+</style>
+
+
+<head>
+    <title>MBot</title>
+</head>
+
+<body>
+
+<div id="listWrapper"></div>
+
+<div id="inputDiv">
+    <form id="form" autocomplete="off" onsubmit="return (typeof submitted == 'undefined') ? (submitted = true) : !submitted">
+        <label>MBot &copy; 2017 Yi Han (Mark) Zhang. Powered by: cleverbot.io, openweathermap.org, newsapi.org</label>
+        <input type="text" id="field" name="input" placeholder="Talk to me right here..." autocomplete="off" autofocus required>
+    </form>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script>
+    var chatList = document.getElementById("listWrapper");
+
+    $(document).ready( function () {
+        $('form').submit( function () {
+            var formdata = $('form').serialize();
+            if (formdata) {
+                $.ajax({
+                    type: "POST",
+                    url: "/mbot/updateChat",
+                    data: formdata,
+                });
+                $("form")[0].reset();
+                setTimeout(function () {
+                    chatList.scrollTop = chatList.scrollHeight - chatList.clientHeight;
+                }, 1000);
+            }
+            return false;
+        });
+    });
+
+
+    function loadlink(){
+        $('#listWrapper').load('/mbot/getChat',function () {
+            $(this).unwrap();
+        });
+    }
+    loadlink(); // This will run on page load
+    setInterval(function(){
+        // allow 1px inaccuracy by adding 1
+        var scroll = (chatList.scrollHeight - chatList.clientHeight) - chatList.scrollTop <= 95;
+        if(scroll)
+            chatList.scrollTop = chatList.scrollHeight - chatList.clientHeight;
+
+
+        loadlink() // this will run after every 5 seconds
+    }, 100);
+
+    function empty() {
+        var x;
+        x = document.getElementById("field").value;
+        if (x == "") {
+            return false;
+        };
+    }
+
+</script>
+</body>
+</html>
